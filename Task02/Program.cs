@@ -1,11 +1,20 @@
-﻿namespace Task02
+﻿using System;
+
+namespace Task02
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var app = new MyApp();
-            app.Run();
+            var shopApp = new ShopApp(Display);
+            shopApp.Run();
+
+            Console.ReadKey();
+        }
+
+        static void Display(string message)
+        {
+            Console.WriteLine(message);
         }
     }
 }
