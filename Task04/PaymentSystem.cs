@@ -2,33 +2,35 @@
 {
     public interface IPaymentSystem
     {
-        public string GetPayingLink();
+        public string GetPayingLink(Order order);
     }
 
     public abstract class PaymentSystemBase : IPaymentSystem
     {
-        private string _baseLink;
-        private IHash _hash;
-        protected string Hash => _hash.Create(GetHashInput());
-        protected Order _order;
+        private readonly string _baseLink;
+        private readonly IHash _hash;
 
-        protected PaymentSystemBase(string baseLink, Order order, IHash hash)
+        protected PaymentSystemBase(string baseLink, IHash hash)
         {
             _baseLink = baseLink;
-            _order = order;
             _hash = hash;
         }
 
-        public string GetPayingLink()
+        protected string CalcHash(Order order)
         {
-            var parameters = GetLinkParameters();
+            return _hash.Create(GetHashInput(order));
+        }
+
+        public string GetPayingLink(Order order)
+        {
+            var parameters = GetLinkParameters(order);
             var fullLink = $"{_baseLink}?{parameters}";
             return fullLink;
         }
 
-        protected abstract string GetLinkParameters();
+        protected abstract string GetLinkParameters(Order order);
 
-        protected abstract string GetHashInput();
+        protected abstract string GetHashInput(Order order);
     }
 
     /// <summary>
@@ -36,16 +38,17 @@
     /// </summary>
     public class PaymentSystem1 : PaymentSystemBase
     {
-        public PaymentSystem1(Order order) : base(baseLink: "pay.system1.ru/order", order, new HashMD5()) { }
+        public PaymentSystem1(string baseLink, IHash hash) : base(baseLink, hash) { }
 
-        protected override string GetLinkParameters()
+        protected override string GetLinkParameters(Order order)
         {
-            return $"amount={_order.Amount}RUB&hash={Hash}";
+            var hash = CalcHash(order);
+            return $"amount={order.Amount}RUB&hash={hash}";
         }
 
-        protected override string GetHashInput()
+        protected override string GetHashInput(Order order)
         {
-            return _order.Id.ToString();
+            return order.Id.ToString();
         }
     }
 
@@ -54,16 +57,17 @@
     /// </summary>
     public class PaymentSystem2 : PaymentSystemBase
     {
-        public PaymentSystem2(Order order) : base(baseLink: "order.system2.ru/pay", order, new HashMD5()) { }
+        public PaymentSystem2(string baseLink, IHash hash) : base(baseLink, hash) { }
 
-        protected override string GetLinkParameters()
+        protected override string GetLinkParameters(Order order)
         {
-            return $"hash={Hash}";
+            var hash = CalcHash(order);
+            return $"hash={hash}";
         }
 
-        protected override string GetHashInput()
+        protected override string GetHashInput(Order order)
         {
-            return (_order.Id + _order.Amount).ToString();
+            return (order.Id + order.Amount).ToString();
         }
     }
 
@@ -74,19 +78,21 @@
     {
         string _secretKey;
 
-        public PaymentSystem3(Order order, string secretKey) : base(baseLink: "system3.com/pay", order, new HashSHA1()) 
+        public PaymentSystem3(string baseLink, string secretKey, IHash hash) : base(baseLink, hash) 
         {
             _secretKey = secretKey;
         }
 
-        protected override string GetLinkParameters()
+        protected override string GetLinkParameters(Order order) 
         {
-            return $"amount={_order.Amount}&currency=RUB&hash={Hash}";
+            var hash = CalcHash(order);
+            return $"amount={order.Amount}&currency=RUB&hash={hash}";
         }
 
-        protected override string GetHashInput()
+        protected override string GetHashInput(Order order)
         {
-            return _order.Id.ToString() + _order.Amount.ToString() + _secretKey;
+            return order.Id.ToString() + order.Amount.ToString() + _secretKey;
         }
     }
+
 }
