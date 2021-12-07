@@ -8,24 +8,25 @@ namespace Task01
         {
             // создаем игрока
             var player = new Player(health: 10);
-            player.OnDamaged += PlayerDamaged;
-            player.OnDie += PlayerDied;
+            player.Damaged += OnPlayerDamaged;
+            player.Die += OnPlayerDied;
 
             // создаем бота с оружием
             var weapon = new Weapon(damage: 6, bullets: 10);
             var bot = new Bot(weapon);
 
-            bot.OnSeePlayer(player);
+            bot.Fire(player);
+            bot.Fire(player);
 
             Console.ReadKey();
         }
 
-        private static void PlayerDamaged()
+        private static void OnPlayerDamaged()
         {
             Console.WriteLine("Игрок ранен");
         }
 
-        private static void PlayerDied()
+        private static void OnPlayerDied()
         {
             Console.WriteLine("Игрок убит");
         }

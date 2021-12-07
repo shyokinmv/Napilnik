@@ -6,33 +6,33 @@ namespace Task01
     {
         private int _health;
 
-        public Action OnDamaged;
-        public Action OnDie;
+        public event Action Damaged;
+        public event Action Die;
 
         public bool IsAlive => _health > 0;
 
         public Player(int health)
         {
-            if (health > 0)
-                _health = health;
-            else
+            if (health <= 0)
                 throw new ArgumentOutOfRangeException(nameof(health));
+
+            _health = health;
         }
 
         public void TakeDamage(int damage)
         {
-            if (damage > 0)
-                _health -= damage;
-            else
+            if (damage <= 0)
                 throw new ArgumentOutOfRangeException(nameof(damage));
+
+            _health -= damage;
 
             if (_health < 0)
                 _health = 0;
 
             if (_health > 0)
-                OnDamaged?.Invoke();
+                Damaged?.Invoke();
             else
-                OnDie?.Invoke();
+                Die?.Invoke();
         }
     }
 
@@ -43,47 +43,40 @@ namespace Task01
 
         public Weapon(int damage, int bullets)
         {
-            if (damage > 0)
-                _damage = damage;
-            else
+            if (damage <= 0)
                 throw new ArgumentOutOfRangeException(nameof(damage));
 
-            if (bullets > 0)
-                _bullets = bullets;
-            else
+            if (bullets <= 0)
                 throw new ArgumentOutOfRangeException(nameof(bullets));
+
+            _damage = damage;
+            _bullets = bullets;
         }
 
         public bool HaveBullets => _bullets > 0;
 
-        public void Fire(Player player)
+        public void Fire(Player target)
         {
-            if (HaveBullets)
-            {
-                _bullets -= 1;
-                player.TakeDamage(_damage);
-            }
-            else
-            {
-                throw new Exception("кончились патроны");
-            }
+            if (!HaveBullets)
+                throw new ArgumentOutOfRangeException(nameof(_bullets), "кончились патроны");
+
+            _bullets -= 1;
+            target.TakeDamage(_damage);
         }
     }
 
     class Bot
     {
-        public Weapon _weapon;
+        private Weapon _weapon;
 
         public Bot(Weapon weapon)
         {
             _weapon = weapon;
         }
 
-        public void OnSeePlayer(Player player)
+        public void Fire(Player target)
         {
-            while (player.IsAlive
-                && _weapon.HaveBullets)
-                _weapon.Fire(player);
+            _weapon.Fire(target);
         }
     }
 }
