@@ -8,8 +8,6 @@ namespace Task01
         {
             // создаем игрока
             var player = new Player(health: 10);
-            player.Damaged += OnPlayerDamaged;
-            player.Die += OnPlayerDied;
 
             // создаем бота с оружием
             var weapon = new Weapon(damage: 6, bullets: 10);

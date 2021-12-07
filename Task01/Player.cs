@@ -6,9 +6,6 @@ namespace Task01
     {
         private int _health;
 
-        public event Action Damaged;
-        public event Action Die;
-
         public bool IsAlive => _health > 0;
 
         public Player(int health)
@@ -28,11 +25,6 @@ namespace Task01
 
             if (_health < 0)
                 _health = 0;
-
-            if (IsAlive)
-                Damaged?.Invoke();
-            else
-                Die?.Invoke();
         }
     }
 }
