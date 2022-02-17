@@ -18,16 +18,5 @@ namespace Task01
 
             Console.ReadKey();
         }
-
-        private static void OnPlayerDamaged()
-        {
-            Console.WriteLine("Игрок ранен");
-        }
-
-        private static void OnPlayerDied()
-        {
-            Console.WriteLine("Игрок убит");
-        }
-
     }
 }

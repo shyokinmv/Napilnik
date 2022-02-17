@@ -23,8 +23,11 @@ namespace Task01
 
         public void Fire(Player target)
         {
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+
             if (!HaveBullets)
-                throw new ArgumentOutOfRangeException(nameof(_bullets), "кончились патроны");
+                throw new InvalidOperationException("кончились патроны");
 
             _bullets -= 1;
             target.TakeDamage(_damage);

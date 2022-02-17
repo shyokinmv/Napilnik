@@ -2,7 +2,7 @@
 
 namespace Task01
 {
-    public class Player : IDamagable
+    public class Player
     {
         private int _health;
 
