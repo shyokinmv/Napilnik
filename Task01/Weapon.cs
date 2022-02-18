@@ -1,29 +1,36 @@
-﻿namespace Task01
+﻿using System;
+
+namespace Task01
 {
-    class Weapon
+    public class Weapon
     {
-        public int Damage;
-        public int Bullets;
+        private int _damage;
+        private int _bullets;
 
-        public void Fire(Player player)
+        public Weapon(int damage, int bullets)
         {
-            player.Health -= Damage;
-            Bullets -= 1;
+            if (damage <= 0)
+                throw new ArgumentOutOfRangeException(nameof(damage));
+
+            if (bullets <= 0)
+                throw new ArgumentOutOfRangeException(nameof(bullets));
+
+            _damage = damage;
+            _bullets = bullets;
         }
-    }
 
-    class Player
-    {
-        public int Health;
-    }
+        public bool HaveBullets => _bullets > 0;
 
-    class Bot
-    {
-        public Weapon Weapon;
-
-        public void OnSeePlayer(Player player)
+        public void Fire(Player target)
         {
-            Weapon.Fire(player);
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+
+            if (!HaveBullets)
+                throw new InvalidOperationException("кончились патроны");
+
+            _bullets -= 1;
+            target.TakeDamage(_damage);
         }
     }
 }
